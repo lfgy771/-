@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>气场颜色测试 · 解锁你的隐藏气场</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #f5f0ff 0%, #f0f5ff 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 750px; margin: 0 auto; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); border-radius: 30px; padding: 40px 30px; text-align: center; }
+        .page { display: none; min-height: 80vh; }
+        .page.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        h1 { color: #2d1b4e; margin-bottom: 20px; font-size: 32px; }
+        .subtitle { color: #666; margin-bottom: 30px; font-size: 16px; line-height: 1.6; }
+        .info-card { background: #f8f6ff; border-radius: 20px; padding: 25px; margin-bottom: 30px; text-align: left; }
+        .info-card h3 { color: #8b5cf6; margin-bottom: 15px; font-size: 18px; display: flex; align-items: center; gap: 10px; }
+        .info-card p { color: #333; font-size: 15px; line-height: 1.6; margin-bottom: 12px; }
+        .info-card p:last-child { margin-bottom: 0; }
+        .start-btn { background: linear-gradient(135deg, #8b5cf6, #c084fc); color: white; border: none; padding: 18px 45px; font-size: 18px; font-weight: 600; border-radius: 50px; cursor: pointer; box-shadow: 0 10px 25px rgba(139,92,246,0.3); transition: all 0.2s; letter-spacing: 1px; width: 100%; max-width: 400px; display: block; margin: 0 auto; }
+        .start-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(139,92,246,0.4); }
+        .start-btn:active { transform: translateY(0); box-shadow: 0 5px 15px rgba(139,92,246,0.2); }
+        .tip { background: #f8f6ff; border-radius: 16px; padding: 15px 20px; margin-bottom: 25px; font-size: 15px; color: #6658a6; border-left: 4px solid #8b5cf6; }
+        .progress-container { width: 100%; margin-bottom: 25px; }
+        .progress-bar { width: 100%; height: 8px; background: #f0f5ff; border-radius: 4px; margin-bottom: 8px; }
+        .progress-fill { height: 100%; background: #8b5cf6; border-radius: 4px; width: 5%; transition: width 0.3s ease; }
+        .progress-text { text-align: center; color: #6658a6; font-size: 14px; }
+        .question { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
+        .question p { font-weight: 600; color: #1a1a2e; margin-bottom: 15px; font-size: 18px; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option-item { display: flex; align-items: center; padding: 12px 18px; background: #f8f6ff; border-radius: 12px; border: 1px solid #e0d5ff; cursor: pointer; transition: all 0.2s; }
+        .option-item:hover { background: #f0e9ff; border-color: #d4bfff; }
+        .option-item input[type="radio"] { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border: 2px solid #8b5cf6; border-radius: 50%; margin-right: 12px; flex-shrink: 0; position: relative; }
+        .option-item input[type="radio"]:checked::after { content: ''; position: absolute; top: 3px; left: 3px; width: 8px; height: 8px; border-radius: 50%; background: #8b5cf6; }
+        .option-item label { flex: 1; cursor: pointer; color: #333; font-size: 16px; }
+        .question-nav { display: flex; justify-content: space-between; margin: 20px 0; }
+        .nav-btn { background: linear-gradient(135deg, #8b5cf6, #c084fc); color: white; border: none; padding: 10px 25px; font-size: 14px; border-radius: 50px; cursor: pointer; max-width: 120px; transition: all 0.2s; }
+        .nav-btn:hover { transform: translateY(-2px); }
+        .nav-btn:disabled { background: #eee; color: #999; cursor: not-allowed; box-shadow: none; transform: none; }
+        .submit-btn { background: linear-gradient(135deg, #8b5cf6, #c084fc); color: white; border: none; padding: 18px 45px; font-size: 18px; font-weight: 600; border-radius: 50px; cursor: pointer; display: block; margin: 30px auto 20px; max-width: 400px; width: 100%; transition: all 0.2s; }
+        .submit-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(139,92,246,0.3); }
+        
+        /* 结果页样式 */
+        .result { margin-top: 20px; padding: 40px 35px; border-radius: 24px; color: white; text-align: left; animation: fadeIn 0.5s; line-height: 1.8; }
+        .result h2 { font-size: 36px; margin-bottom: 25px; text-align: center; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .result .main-desc { font-size: 19px; line-height: 1.8; margin-bottom: 30px; text-align: center; }
+        .result .detail-section { background: rgba(255,255,255,0.15); border-radius: 16px; padding: 25px; margin-bottom: 30px; backdrop-filter: blur(5px); }
+        .result .detail-title { font-size: 20px; font-weight: 600; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.2); }
+        .result .detail-item { margin-bottom: 18px; font-size: 17px; line-height: 1.8; }
+        .result .detail-item strong { display: inline-block; min-width: 90px; font-weight: 600; }
+        
+        /* 次气场颜色卡片 */
+        .secondary-color-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 25px 0;
+            border: 2px dashed rgba(255,255,255,0.3);
+        }
+        .secondary-color-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .secondary-color-desc {
+            font-size: 16px;
+            line-height: 1.7;
+            opacity: 0.9;
+        }
+        
+        /* 私信引导按钮 */
+        .private-chat-section {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .private-chat-btn {
+            background: white;
+            color: #8b5cf6;
+            border: none;
+            padding: 18px 35px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto 15px;
+            display: block;
+        }
+        .private-chat-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(139,92,246,0.2);
+        }
+        .private-chat-tip {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+        .wechat-qr {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 16px;
+        }
+        .wechat-qr.show {
+            display: block;
+        }
+        .wechat-qr img {
+            width: 200px;
+            height: 200px;
+            border-radius: 16px;
+            margin: 10px auto;
+            display: block;
+        }
+        
+        .adapt-suggest { background: rgba(255,255,255,0.2); border-radius: 12px; padding: 20px; margin-top: 20px; font-size: 17px; line-height: 1.8; }
+        .adapt-suggest strong { font-size: 18px; display: block; margin-bottom: 10px; }
+        .footer { text-align: center; margin-top: 25px; color: #999; font-size: 13px; }
+        
+        /* 10种气场颜色样式 */
+        .result.red { background: linear-gradient(135deg, #ff4d4d, #ff8080); }
+        .result.orange { background: linear-gradient(135deg, #ff7a00, #ffb347); }
+        .result.yellow { background: linear-gradient(135deg, #f1c40f, #f7dc6f); color: #333 !important; }
+        .result.green { background: linear-gradient(135deg, #2ecc71, #6fe7a3); }
+        .result.blue { background: linear-gradient(135deg, #4d7fff, #80b3ff); }
+        .result.purple { background: linear-gradient(135deg, #9f4dff, #c080ff); }
+        .result.pink { background: linear-gradient(135deg, #ff69b4, #ff99cc); }
+        .result.brown { background: linear-gradient(135deg, #8b4513, #c19a6b); }
+        .result.silver { background: linear-gradient(135deg, #c0c0c0, #e6e6e6); color: #333 !important; }
+        .result.gold { background: linear-gradient(135deg, #ffd700, #ffedbc); color: #333 !important; }
+        
+        .result.yellow .private-chat-btn,
+        .result.silver .private-chat-btn,
+        .result.gold .private-chat-btn {
+            color: #333;
+            border: 1px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <!-- 首页 -->
+    <div id="info-page" class="page active">
+        <div class="container">
+            <h1>✨ 气场颜色测试</h1>
+            <div class="subtitle">解锁你的隐藏能量 · 发现最真实的自己</div>
+            <div class="info-card">
+                <h3>📝 测试说明</h3>
+                <p>• 20道专业心理题，从外向性、尽责性、宜人性、情绪稳定性四大维度解析你的专属气场颜色</p>
+                <p>• 全程仅需5-8分钟，凭<strong>第一直觉</strong>选择答案，无对错之分，越真实结果越精准</p>
+                <p>• 完成后获得500字以上专属深度分析，含核心特质、外在表现、优势挑战及专属提升建议</p>
+                <p>• 共10种气场颜色，每种各有特质，无高低优劣，每一种都是独一无二的你</p>
+            </div>
+            <div class="info-card">
+                <h3>💡 测试价值</h3>
+                <p>• 深度了解自己的核心人格特质，看清自己的外在表现与内在本心</p>
+                <p>• 精准发现自身与生俱来的优势，以及现阶段需要突破的成长挑战</p>
+                <p>• 获取量身定制的穿搭、社交、工作、生活专属适配建议，让气场发挥最大价值</p>
+                <p>• 读懂自己的气场密码，学会利用气场优势，成为更优秀的自己</p>
+            </div>
+            <button class="start-btn" id="startTestBtn">🚀 开始测试</button>
+            <div class="footer">测试结果基于大五人格维度分析，仅供自我探索与成长参考</div>
+        </div>
+    </div>
+
+    <!-- 答题页 -->
+    <div id="test-page" class="page">
+        <div class="container">
+            <h1>✨ 气场颜色测试</h1>
+            <div class="subtitle">请凭第一直觉回答以下问题</div>
+            <div class="tip">💡 凭<strong>第一直觉</strong>选择，不要过度思考和反复修改，才能获得最贴合你本心的真实结果</div>
+            <div class="progress-container">
+                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                <div class="progress-text" id="progressText">第1题/共20题 · 预计还需6分钟完成</div>
+            </div>
+            <div id="test-container"></div>
+            <div class="question-nav">
+                <button class="nav-btn" id="prevBtn" disabled>上一题</button>
+                <button class="nav-btn" id="nextBtn">下一题</button>
+            </div>
+            <button class="submit-btn" id="submitTestBtn">✨ 查看我的专属气场颜色</button>
+            <div class="footer">测试结果基于大五人格维度分析，仅供自我探索与成长参考</div>
+        </div>
+    </div>
+
+    <!-- 结果页 -->
+    <div id="result-page" class="page">
+        <div class="container">
+            <h1>✨ 你的专属气场颜色测试结果</h1>
+            <div class="subtitle">深度解析 · 解锁你的隐藏能量</div>
+            <div id="resultContainer" class="result"></div>
+            <div class="footer">测试结果基于大五人格维度分析，仅供自我探索与成长参考</div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentQ = 0;
+        let userAnswers = {};
+
+        // 完整20道题目（包含四个维度各5题）
+        const scientificQuestions = [
+            // 维度1：外向性（5题）
+            {
+                text: "在多人社交场合中，你更偏向于哪种角色？",
+                dimension: "外向性",
+                options: [
+                    {text: "主动发起话题，带动全场气氛", scores: {red:9, orange:9, yellow:8, green:3, blue:2, purple:4, pink:7, brown:4, silver:2, gold:8}},
+                    {text: "默默倾听为主，偶尔参与讨论", scores: {red:5, orange:6, yellow:5, green:7, blue:7, purple:6, pink:6, brown:7, silver:7, gold:5}},
+                    {text: "只和熟悉的人交流，远离陌生人", scores: {red:3, orange:4, yellow:3, green:8, blue:6, purple:7, pink:8, brown:8, silver:6, gold:3}},
+                    {text: "看氛围调整，可热闹可安静", scores: {red:7, orange:8, yellow:7, green:5, blue:5, purple:5, pink:5, brown:5, silver:5, gold:7}}
+                ]
+            },
+            {
+                text: "面对陌生人的主动搭讪，你的第一反应是？",
+                dimension: "外向性",
+                options: [
+                    {text: "热情回应，轻松开启聊天", scores: {red:9, orange:9, yellow:8, green:2, blue:1, purple:3, pink:8, brown:3, silver:1, gold:8}},
+                    {text: "礼貌回应，但保持距离", scores: {red:6, orange:7, yellow:6, green:7, blue:8, purple:7, pink:6, brown:7, silver:8, gold:6}},
+                    {text: "感到紧张，想尽快结束对话", scores: {red:3, orange:4, yellow:3, green:9, blue:7, purple:8, pink:7, brown:8, silver:7, gold:4}},
+                    {text: "看眼缘，合得来就聊", scores: {red:7, orange:8, yellow:7, green:5, blue:5, purple:6, pink:9, brown:5, silver:5, gold:7}}
+                ]
+            },
+            {
+                text: "朋友邀请你参加全是陌生人的聚会，你会？",
+                dimension: "外向性",
+                options: [
+                    {text: "欣然前往，觉得能认识新朋友", scores: {red:9, orange:10, yellow:9, green:2, blue:1, purple:4, pink:7, brown:3, silver:2, gold:8}},
+                    {text: "犹豫后答应，试试看", scores: {red:7, orange:8, yellow:7, green:6, blue:5, purple:7, pink:8, brown:6, silver:5, gold:7}},
+                    {text: "直接拒绝，不想面对陌生社交", scores: {red:2, orange:3, yellow:2, green:9, blue:8, purple:8, pink:4, brown:9, silver:9, gold:3}},
+                    {text: "看是谁邀请，关系好就去", scores: {red:6, orange:7, yellow:6, green:7, blue:6, purple:6, pink:9, brown:7, silver:7, gold:6}}
+                ]
+            },
+            {
+                text: "每天起床后，你的精力状态通常是？",
+                dimension: "外向性",
+                options: [
+                    {text: "活力满满，快速进入状态", scores: {red:9, orange:9, yellow:10, green:4, blue:3, purple:5, pink:6, brown:5, silver:3, gold:9}},
+                    {text: "慢慢苏醒，需要咖啡唤醒", scores: {red:7, orange:7, yellow:8, green:7, blue:8, purple:7, pink:7, brown:7, silver:8, gold:7}},
+                    {text: "昏昏沉沉，需要很久缓过神", scores: {red:4, orange:5, yellow:5, green:8, blue:7, purple:8, pink:5, brown:8, silver:7, gold:4}},
+                    {text: "不想起床，提不起精神", scores: {red:3, orange:4, yellow:4, green:6, blue:5, purple:6, pink:4, brown:6, silver:6, gold:3}}
+                ]
+            },
+            {
+                text: "连续工作数小时后，你的状态更接近？",
+                dimension: "外向性",
+                options: [
+                    {text: "依然精力充沛，能继续推进", scores: {red:9, orange:8, yellow:9, green:4, blue:7, purple:5, pink:5, brown:7, silver:8, gold:9}},
+                    {text: "略有疲惫，但能保持专注", scores: {red:7, orange:7, yellow:7, green:7, blue:9, purple:7, pink:7, brown:8, silver:9, gold:8}},
+                    {text: "明显走神，需要频繁休息", scores: {red:5, orange:9, yellow:6, green:8, blue:5, purple:9, pink:8, brown:5, silver:6, gold:5}},
+                    {text: "身心俱疲，无法集中注意力", scores: {red:3, orange:5, yellow:4, green:9, blue:4, purple:8, pink:9, brown:6, silver:5, gold:4}}
+                ]
+            },
+            // 维度2：尽责性（5题）
+            {
+                text: "做重要决策时，你的核心方式是？",
+                dimension: "尽责性",
+                options: [
+                    {text: "快速分析利弊，果断选择", scores: {red:9, orange:5, yellow:6, green:4, blue:8, purple:5, pink:3, brown:7, silver:8, gold:9}},
+                    {text: "反复权衡，谨慎决定", scores: {red:6, orange:4, yellow:5, green:6, blue:9, purple:6, pink:5, brown:9, silver:9, gold:8}},
+                    {text: "参考他人意见，综合选择", scores: {red:5, orange:6, yellow:7, green:8, blue:7, purple:7, pink:8, brown:8, silver:7, gold:7}},
+                    {text: "跟着直觉走，感觉对就决定", scores: {red:7, orange:8, yellow:8, green:5, blue:4, purple:9, pink:7, brown:5, silver:4, gold:5}}
+                ]
+            },
+            {
+                text: "计划被突发情况打乱，你会？",
+                dimension: "尽责性",
+                options: [
+                    {text: "立刻调整计划，找替代方案", scores: {red:9, orange:8, yellow:7, green:5, blue:9, purple:6, pink:4, brown:8, silver:9, gold:9}},
+                    {text: "略有烦躁，但会接受调整", scores: {red:7, orange:7, yellow:8, green:7, blue:8, purple:7, pink:6, brown:9, silver:8, gold:8}},
+                    {text: "不知所措，需要别人帮忙", scores: {red:4, orange:5, yellow:5, green:8, blue:5, purple:8, pink:8, brown:6, silver:5, gold:5}},
+                    {text: "无所谓，顺其自然", scores: {red:3, orange:9, yellow:9, green:6, blue:4, purple:9, pink:7, brown:5, silver:4, gold:4}}
+                ]
+            },
+            {
+                text: "面对从未接触过的新任务，你会？",
+                dimension: "尽责性",
+                options: [
+                    {text: "立刻动手尝试，在实践中摸索", scores: {red:9, orange:9, yellow:7, green:5, blue:7, purple:8, pink:5, brown:6, silver:6, gold:8}},
+                    {text: "先查资料，理清思路再开始", scores: {red:7, orange:6, yellow:6, green:7, blue:9, purple:7, pink:6, brown:9, silver:9, gold:9}},
+                    {text: "感到迷茫，找有经验的人请教", scores: {red:5, orange:5, yellow:8, green:8, blue:8, purple:6, pink:8, brown:8, silver:8, gold:7}},
+                    {text: "拖延回避，最后一刻才开始", scores: {red:3, orange:8, yellow:5, green:6, blue:4, purple:9, pink:7, brown:5, silver:5, gold:4}}
+                ]
+            },
+            {
+                text: "在团队合作中，你更擅长的角色是？",
+                dimension: "尽责性",
+                options: [
+                    {text: "领导者，统筹规划推动进展", scores: {red:10, orange:7, yellow:6, green:5, blue:8, purple:6, pink:4, brown:7, silver:7, gold:9}},
+                    {text: "协调者，沟通各方保障和谐", scores: {red:7, orange:6, yellow:8, green:9, blue:7, purple:7, pink:9, brown:8, silver:6, gold:7}},
+                    {text: "执行者，认真完成分配任务", scores: {red:6, orange:5, yellow:7, green:8, blue:9, purple:5, pink:7, brown:9, silver:8, gold:8}},
+                    {text: "创意者，发散思维提供思路", scores: {red:8, orange:9, yellow:9, green:6, blue:6, purple:9, pink:8, brown:6, silver:9, gold:6}}
+                ]
+            },
+            {
+                text: "选择物品时，你的核心考量是？",
+                dimension: "尽责性",
+                options: [
+                    {text: "实用性，能解决实际问题", scores: {red:8, orange:7, yellow:6, green:7, blue:9, purple:5, pink:6, brown:9, silver:8, gold:9}},
+                    {text: "颜值，符合自己的审美", scores: {red:7, orange:9, yellow:8, green:8, blue:6, purple:9, pink:9, brown:7, silver:7, gold:7}},
+                    {text: "性价比，兼顾价格和品质", scores: {red:7, orange:8, yellow:7, green:9, blue:8, purple:7, pink:8, brown:8, silver:9, gold:8}},
+                    {text: "眼缘，第一眼喜欢就买", scores: {red:9, orange:10, yellow:9, green:6, blue:5, purple:8, pink:10, brown:6, silver:6, gold:6}}
+                ]
+            },
+            // 维度3：宜人性（5题）
+            {
+                text: "朋友向你倾诉烦恼时，你会？",
+                dimension: "宜人性",
+                options: [
+                    {text: "直接给出解决方案，帮对方解决", scores: {red:8, orange:7, yellow:6, green:5, blue:6, purple:5, pink:4, brown:6, silver:5, gold:8}},
+                    {text: "安静倾听，给予情绪安慰", scores: {red:4, orange:5, yellow:7, green:9, blue:4, purple:7, pink:9, brown:8, silver:4, gold:5}},
+                    {text: "感同身受，一起吐槽发泄", scores: {red:6, orange:8, yellow:9, green:8, blue:5, purple:8, pink:8, brown:5, silver:6, gold:6}},
+                    {text: "不知所措，只能默默陪伴", scores: {red:3, orange:4, yellow:5, green:7, blue:3, purple:6, pink:7, brown:7, silver:7, gold:4}}
+                ]
+            },
+            {
+                text: "当你产生负面情绪时，会如何处理？",
+                dimension: "宜人性",
+                options: [
+                    {text: "立刻发泄出来，不憋在心里", scores: {red:9, orange:8, yellow:9, green:4, blue:3, purple:6, pink:7, brown:5, silver:3, gold:8}},
+                    {text: "独自消化，自己调节", scores: {red:5, orange:6, yellow:6, green:7, blue:9, purple:8, pink:6, brown:8, silver:9, gold:6}},
+                    {text: "向亲密的人倾诉，寻求安慰", scores: {red:7, orange:7, yellow:8, green:9, blue:6, purple:7, pink:9, brown:7, silver:7, gold:7}},
+                    {text: "压抑情绪，假装没事", scores: {red:4, orange:5, yellow:5, green:6, blue:7, purple:5, pink:8, brown:9, silver:8, gold:5}}
+                ]
+            },
+            {
+                text: "你的情绪表达方式更接近？",
+                dimension: "宜人性",
+                options: [
+                    {text: "外放直接，开心难过都写在脸上", scores: {red:9, orange:9, yellow:9, green:4, blue:3, purple:6, pink:8, brown:5, silver:3, gold:8}},
+                    {text: "内敛稳定，很少表露情绪", scores: {red:4, orange:5, yellow:5, green:7, blue:9, purple:8, pink:6, brown:8, silver:9, gold:6}},
+                    {text: "敏感细腻，容易被小事触动", scores: {red:6, orange:7, yellow:8, green:9, blue:6, purple:9, pink:9, brown:7, silver:7, gold:5}},
+                    {text: "乐观积极，很少有负面情绪", scores: {red:8, orange:8, yellow:10, green:8, blue:7, purple:7, pink:7, brown:6, silver:8, gold:7}}
+                ]
+            },
+            {
+                text: "和他人交流时，你更在意的是？",
+                dimension: "宜人性",
+                options: [
+                    {text: "表达自己的想法，让别人理解", scores: {red:9, orange:8, yellow:7, green:6, blue:7, purple:7, pink:6, brown:6, silver:8, gold:9}},
+                    {text: "倾听他人的想法，给予理解", scores: {red:5, orange:6, yellow:8, green:9, blue:8, purple:8, pink:9, brown:8, silver:7, gold:7}},
+                    {text: "双方聊得开心，氛围轻松", scores: {red:7, orange:9, yellow:9, green:8, blue:6, purple:9, pink:8, brown:7, silver:6, gold:8}},
+                    {text: "交流有价值，能学到东西", scores: {red:8, orange:7, yellow:6, green:7, blue:9, purple:6, pink:7, brown:9, silver:9, gold:8}}
+                ]
+            },
+            {
+                text: "面对社交中的尴尬场面，你会？",
+                dimension: "宜人性",
+                options: [
+                    {text: "主动打圆场，快速化解尴尬", scores: {red:9, orange:9, yellow:8, green:7, blue:6, purple:7, pink:8, brown:6, silver:5, gold:8}},
+                    {text: "默默看着，等别人来化解", scores: {red:5, orange:6, yellow:7, green:8, blue:8, purple:8, pink:7, brown:8, silver:9, gold:6}},
+                    {text: "感到不自在，想尽快离开", scores: {red:4, orange:5, yellow:6, green:9, blue:7, purple:9, pink:6, brown:7, silver:8, gold:5}},
+                    {text: "假装没看见，继续做自己的事", scores: {red:7, orange:8, yellow:9, green:6, blue:9, purple:6, pink:5, brown:9, silver:7, gold:7}}
+                ]
+            },
+            // 维度4：情绪稳定性+开放性（5题）
+            {
+                text: "面对他人的批评和指责，你会？",
+                dimension: "情绪稳定性+开放性",
+                options: [
+                    {text: "不服气，立刻反驳维护自己", scores: {red:9, orange:7, yellow:8, green:3, blue:4, purple:5, pink:4, brown:5, silver:3, gold:8}},
+                    {text: "冷静接受，反思自己的问题", scores: {red:6, orange:5, yellow:6, green:7, blue:9, purple:7, pink:6, brown:8, silver:9, gold:7}},
+                    {text: "感到受伤，心里难受需要消化", scores: {red:4, orange:6, yellow:5, green:8, blue:5, purple:8, pink:9, brown:6, silver:6, gold:5}},
+                    {text: "毫不在意，不往心里去", scores: {red:7, orange:9, yellow:9, green:5, blue:6, purple:6, pink:7, brown:7, silver:8, gold:6}}
+                ]
+            },
+            {
+                text: "当你感到身心疲惫时，充电方式是？",
+                dimension: "情绪稳定性+开放性",
+                options: [
+                    {text: "和朋友聚会说笑", scores: {red:8, orange:9, yellow:8, green:4, blue:3, purple:5, pink:6, brown:4, silver:3, gold:7}},
+                    {text: "独自待着不被打扰", scores: {red:3, orange:2, yellow:2, green:9, blue:10, purple:8, pink:5, brown:8, silver:9, gold:4}},
+                    {text: "做喜欢的事转移注意力", scores: {red:5, orange:7, yellow:7, green:6, blue:5, purple:9, pink:8, brown:5, silver:6, gold:6}},
+                    {text: "通过运动流汗释放压力", scores: {red:9, orange:6, yellow:5, green:3, blue:2, purple:3, pink:4, brown:9, silver:2, gold:9}}
+                ]
+            },
+            {
+                text: "你的情绪受外界影响的程度？",
+                dimension: "情绪稳定性+开放性",
+                options: [
+                    {text: "几乎不受影响，保持自己节奏", scores: {red:9, orange:7, yellow:8, green:6, blue:9, purple:7, pink:5, brown:8, silver:9, gold:9}},
+                    {text: "略有影响，但能快速调整", scores: {red:8, orange:8, yellow:9, green:7, blue:8, purple:8, pink:7, brown:9, silver:8, gold:8}},
+                    {text: "受影响很大，容易被带动", scores: {red:6, orange:9, yellow:7, green:9, blue:6, purple:9, pink:9, brown:7, silver:6, gold:6}},
+                    {text: "完全受影响，被别人左右", scores: {red:4, orange:6, yellow:6, green:8, blue:5, pink:8, brown:6, silver:5, gold:5}}
+                ]
+            },
+            {
+                text: "周末闲暇时，你更倾向于？",
+                dimension: "情绪稳定性+开放性",
+                options: [
+                    {text: "提前安排丰富活动", scores: {red:9, orange:8, yellow:7, green:5, blue:8, purple:6, pink:6, brown:8, silver:7, gold:9}},
+                    {text: "宅家做自己的事", scores: {red:4, orange:5, yellow:5, green:8, blue:9, purple:9, pink:7, brown:9, silver:9, gold:5}},
+                    {text: "一半社交一半独处", scores: {red:7, orange:9, yellow:8, green:7, blue:7, purple:8, pink:8, brown:7, silver:8, gold:7}},
+                    {text: "不做计划，随心情而定", scores: {red:6, orange:10, yellow:9, green:6, blue:6, purple:7, pink:9, brown:6, silver:6, gold:6}}
+                ]
+            },
+            {
+                text: "面对全新的陌生环境，你的状态是？",
+                dimension: "情绪稳定性+开放性",
+                options: [
+                    {text: "充满好奇，快速适应探索", scores: {red:9, orange:10, yellow:9, green:5, blue:7, purple:9, pink:7, brown:5, silver:8, gold:8}},
+                    {text: "略有拘谨，慢慢熟悉", scores: {red:7, orange:8, yellow:8, green:7, blue:8, purple:8, pink:8, brown:8, silver:9, gold:7}},
+                    {text: "感到紧张，想找熟悉的人", scores: {red:5, orange:6, yellow:7, green:9, blue:6, purple:7, pink:9, brown:9, silver:7, gold:6}},
+                    {text: "十分抵触，只想逃离", scores: {red:3, orange:5, yellow:5, green:8, blue:5, purple:6, pink:6, brown:7, silver:6, gold:4}}
+                ]
+            }
+        ];
+
+        // 10种气场颜色的完整解析文案（每个超过500字）
+        const resultTexts = {
+            red: {
+                title: "🔴 红色气场 —— 火焰领袖",
+                desc: "你的气场是热烈的火焰红，自带天生的领袖气质和强大的行动力，像一团燃烧的火焰，走到哪里都能带来强烈的存在感和感染力。你骨子里藏着不服输的韧劲和勇往直前的魄力，从不畏惧挑战，越是艰难的处境，越能激发你的斗志。你不喜欢拖泥带水，做事果断直接，有明确的目标和方向，并且愿意为了目标拼尽全力。你的红色气场让你自带光芒，不用刻意表现，就会成为人群中的焦点，吸引来志同道合的追随者和宝贵的机遇，你的人生注定是轰轰烈烈，充满无限可能的。红色代表着你内心深处那股永不熄灭的激情，你渴望在这个世界上留下自己的印记，渴望被看见、被认可、被记住。你不甘平庸，不愿随波逐流，即使在最黑暗的时刻，你内心的火焰也会指引你前行的方向。你的存在本身就是一种力量，能够点燃身边人的希望和勇气，带领大家一起冲破困境，迎接光明。",
+                coreTrait: "自信果敢、行动力超强、目标感十足、热情执着、敢闯敢拼、有领导力、爱恨分明、直率坦诚",
+                external: "在他人眼中，你是充满活力、雷厉风行的人，说话有分量，做事有效率，自带“这事交给我准没错”的笃定感。你从不掩饰想法，喜怒哀乐都写在脸上，直率的性格收获了很多真心朋友，也可能因过于直接不经意得罪人。你在人群中自带焦点，工作或社交中能快速占据主导地位，成为团队核心，大家会不自觉依赖、信任你，愿意跟着你的脚步前进。你的出现总能打破沉闷，带来新的活力和方向，你就像一面旗帜，让人们看到目标和希望。",
+                advantage: "你有与生俱来的领导力和组织能力，能快速统筹规划推动事情发展；行动力一流，想到就做不拖延，能抓住稍纵即逝的机遇；内心强大抗压能力强，面对困难从不轻言放弃，能快速调整状态重新出发；待人真诚爱恨分明，不玩心机，收获最真挚的感情和人脉；有强烈的责任感，一旦承担事情就竭尽全力做到最好，让人无比信赖。你的热情和执着具有强大的感染力，能够带动整个团队朝着共同的目标前进，即使遇到挫折也能保持斗志，永不言败。",
+                challenge: "你的果断有时会变成武断，过于相信自己的判断，忽略他人意见建议，导致决策出现偏差；直率有时显得强势，说话不懂拐弯抹角，容易无意间伤害他人感情，影响人际关系；过于追求结果，忽略过程细节，做事不够严谨，出现不必要的失误；习惯冲锋陷阵，不懂放慢脚步，给自己和身边人留喘息空间，容易陷入过度劳累；好胜心太强，凡事都想争第一，偶尔因急于求成做出冲动决定。这些挑战提醒你需要学会平衡，既保持锐气，也要懂得柔软。",
+                energyColor: "正红、酒红、朱砂红、枫叶红、砖红",
+                suitableField: "企业管理、创业、销售、市场推广、竞技体育、公关、律师、军事相关",
+                adaptSuggest: "穿搭上，可选择简约利落的红色系单品，如酒红西装、朱砂红针织衫，凸显气场又不张扬；社交中，学会放慢语速耐心倾听，不要急于表达，给别人留表达空间，说话多用委婉措辞，避免过于直接；工作中，学会适当放权，相信身边人的能力，发挥团队优势，做决策时多参考他人建议，三思而后行，注重细节让结果更完美；生活中，学会放慢脚步，给自己留放松时间，不要总把弦绷太紧，适当放下好胜心，接受自己的不完美，享受平淡生活，让身心充分休息。"
+            },
+            orange: {
+                title: "🟠 橙色气场 —— 创意玩家",
+                desc: "你的气场是温暖的阳光橙，像冬日暖阳、夏日晚风，自带治愈的活力和满满的创意，走到哪里都能给身边人带来快乐和惊喜。你骨子里藏着对生活的热爱和对新鲜事物的好奇，永远保持着一颗童心，对世界充满探索欲。你思维活跃，脑洞大开，总能想出别人想不到的创意和点子，用独特的视角看待问题。你的橙色气场让你成为朋友圈里的气氛担当，有你在的地方永远不会缺少欢声笑语，大家都喜欢和你在一起，因为你能带来满满的正能量和无限的乐趣，你的人生就像一场精彩的冒险，永远充满未知和惊喜。橙色代表着你对生活的热爱和对自由的向往，你不喜欢被束缚，讨厌一成不变，总是在寻找新的刺激和挑战。你的世界里没有无聊这个词，因为你总能从平凡中发现不平凡，从日常中找到乐趣，你就像一个永不停歇的探索者，永远保持好奇，永远充满热情。",
+                coreTrait: "热情开朗、创意十足、思维活跃、爱冒险、乐观积极、社交达人、随性洒脱、好奇心强",
+                external: "在他人眼中，你是充满活力、风趣幽默的人，浑身散发阳光气息，让人忍不住想要靠近。你喜欢尝试新鲜事物，追求刺激和挑战，生活过得多姿多彩从不枯燥。你思维跳跃说话风趣，总能用幽默化解尴尬带动全场气氛，是社交场合最受欢迎的人。你不喜欢被束缚，追求自由和随性，做事随心所欲跟着感觉走，这样的性格让你收获很多朋友，也显得格外真实可爱，别人和你相处会感到轻松自在无压力，因为你从不斤斤计较，总用乐观心态看待一切。你的笑容和热情具有感染力，能让身边的人也跟着开心起来。",
+                advantage: "你有超强的创造力和想象力，总能想出独特的解决方案，在创意领域大放异彩；社交能力一流，能快速和不同类型的人打成一片，积累广泛的人脉；乐观积极心态超好，不管遇到什么困难都能笑着面对，快速调整状态；对生活充满热爱，永远保持好奇心，能发现生活中的小美好，让人生充满乐趣；随性洒脱不斤斤计较，待人真诚，收获最真挚的感情；适应能力超强，能快速融入新环境接受新事物，在任何场合都如鱼得水。你的灵活性和创造力让你能够应对各种突发情况，总能在关键时刻想出意想不到的解决方案。",
+                challenge: "你的好奇心太强，容易对一件事产生兴趣后快速失去热情，三分钟热度成为最大问题，很难坚持把一件事做到极致；思维跳跃做事缺乏规划，容易想到什么就做什么，导致事情杂乱无章效率低下；追求自由和随性，不喜欢被规则束缚，偶尔会因无视规则给自己带来麻烦；过于乐观，有时会低估问题难度，对事情缺乏足够预判，遇到问题时手足无措；社交过于广泛，容易陷入泛泛之交，很难拥有真正的深度关系，需要帮助时可能找不到靠谱的人；做事随心所欲不够稳重，偶尔会因冲动做出错误决定。这些挑战提醒你需要培养专注力和规划能力，让自己既有创意又有执行力。",
+                energyColor: "鲜橙、珊瑚橙、南瓜橙、焦糖橙、橘红",
+                suitableField: "创意设计、广告策划、新媒体、娱乐行业、旅游、市场营销、演艺、教育培训",
+                adaptSuggest: "穿搭上，可选择暖橙色系单品，如珊瑚橙连衣裙、焦糖橙卫衣，凸显活力又给人温暖感觉，搭配简约配饰让造型更有层次感；社交中，学会筛选社交圈，把时间和精力放在值得的人身上，培养深度人际关系，不要一味追求数量忽略质量；工作中，建立目标拆解和时间规划习惯，把大目标拆分成小计划按步骤完成，培养专注力和坚持力，做事前理清思路制定详细计划，避免杂乱无章；生活中，学会坚持做一件事，哪怕是小事也要逼着自己坚持到底，培养毅力，做事前多思考多预判问题，让自己变得更稳重，学会遵守规则，在规则框架内追求自由和创意。"
+            },
+            yellow: {
+                title: "🟡 黄色气场 —— 骄阳乐天派",
+                desc: "你的气场是明亮的骄阳黄，像夏日正午的阳光，耀眼而温暖，自带满满的正能量和乐观的心态，走到哪里都能驱散阴霾，带来希望。你骨子里藏着一种天生的乐观，不管遇到什么困难和挫折，都能笑着面对，相信一切都会好起来。你性格开朗，待人友善，对身边的人都充满了善意，总是愿意伸出援手帮助别人，不求回报。你的黄色气场让你成为身边人的“小太阳”，当别人感到迷茫、难过时，只要有你在，就能感受到温暖和力量，重新燃起对生活的希望。你的人生或许不会一帆风顺，但你会用自己的乐观和开朗，把所有的坎坷都变成成长的垫脚石，活成一道耀眼的光。黄色代表着你的智慧和洞察力，你看待问题总能找到积极的一面，即使在最黑暗的时刻也能发现希望的火种。你的存在就像一道光，照亮了身边的人，让他们看到生活的美好和无限可能。",
+                coreTrait: "开朗乐观、积极向上、待人友善、心胸开阔、充满正能量、活在当下、单纯善良、感染力强",
+                external: "在他人眼中，你是浑身充满正能量的“小太阳”，性格开朗笑容灿烂，让人看了就心情变好。你待人友善没有心机，对身边人都真诚相待，愿意无条件帮助别人，这样的性格收获了很多真心朋友。你不喜欢钻牛角尖，心胸开阔凡事都往好的方面想，即使遇到不开心的事也能快速调整心态，从不把负面情绪带给别人。你活在当下，懂得享受生活中的小美好，不纠结于过去不焦虑于未来，这样的生活态度让你显得格外洒脱，别人和你相处会感到格外轻松，因为你从不抱怨，总用积极心态看待一切，能带动身边人一起变得乐观向上。",
+                advantage: "你有超强的情绪调节能力，不管遇到什么负面情绪都能快速自我消化，从不把情绪憋在心里；乐观心态极具感染力，能带动身边人一起积极向上，营造良好氛围；待人友善心胸开阔，不斤斤计较，能收获最真挚的感情和广泛的人脉；单纯善良内心干净，对世界充满善意，能感受到生活中的更多美好；活在当下懂得享受生活，不会因过去的遗憾或未来的焦虑影响当下心情，让生活充满乐趣；抗压能力强，面对困难和挫折从不轻言放弃，总能在逆境中找到希望。你的乐观和善良让你拥有强大的吸引力，人们愿意靠近你、信任你、依赖你。",
+                challenge: "你的乐观有时会变成盲目乐观，对问题的严重性缺乏足够认识，容易忽视潜在的风险，导致事情出现意外；过于善良不懂拒绝别人，容易被别人利用，让自己陷入不必要的麻烦；活在当下的性格，有时会让你缺乏长远的规划，对人生没有明确的目标，容易浑浑噩噩度过；不喜欢思考复杂的问题，遇事容易逃避，缺乏深度思考的能力，导致做事不够成熟；过于在意别人的感受，总是委屈自己成全别人，容易忽略自己的需求，让自己感到疲惫；性格过于单纯，容易相信别人，缺乏辨别是非的能力，容易被别人的花言巧语所欺骗。这些挑战提醒你需要学会保护自己，在保持善良的同时也要有边界感。",
+                energyColor: "明黄、姜黄、奶油黄、柠檬黄、蛋黄",
+                suitableField: "传媒、娱乐、教育培训、心理咨询、公益事业、服务行业、旅游、文创",
+                adaptSuggest: "穿搭上，可选择姜黄、奶油黄等柔和的黄色系单品，如姜黄西装、奶油黄连衣裙，凸显阳光气质又不刺眼，搭配白色、米色等浅色系让造型更温柔；社交中，学会拒绝别人，建立自己的边界感，不要一味委屈自己成全别人，学会关注自己的感受，对于别人的请求量力而行，不要勉强自己；工作中，树立长远目标，制定详细的人生规划，不要浑浑噩噩度过，学会深度思考问题，不要逃避困难，遇到问题时多分析多思考，培养成熟度；生活中，保持乐观的同时学会理性看待问题，对事情做足预判规避潜在风险，学会辨别是非，不要轻易相信别人的花言巧语，保护好自己，多关注自己的需求，学会爱自己，让内心更强大。"
+            },
+            green: {
+                title: "🟢 绿色气场 —— 森林治愈者",
+                desc: "你的气场是温润的森林绿，像雨后的森林，清新而治愈，自带一种平和的力量，走到哪里都能让身边的人感到心安。你骨子里藏着一种天生的温柔和包容，性格温和，待人友善，总能站在别人的角度思考问题，理解别人的难处。你心思细腻，共情能力超强，能敏锐地捕捉到别人的情绪变化，在别人需要安慰和陪伴时，总能及时伸出援手。你的绿色气场让你成为身边人的“树洞”和“心灵港湾”，当别人感到焦虑、迷茫、难过时，只要靠近你，就能感受到内心的平静和温暖，所有的负面情绪都会慢慢消散。你的人生就像一片宁静的森林，包容万物，治愈一切，用温柔的力量面对这个世界。绿色代表着你的成长和生命力，你像一棵大树一样，扎根大地，向上生长，用自己的枝叶为他人遮风挡雨。你不张扬，不炫耀，只是默默地站在那里，用自己的存在给予他人力量和安慰。你的温柔不是软弱，而是一种更深沉的力量，能够包容一切，也能治愈一切。",
+                coreTrait: "温柔包容、心思细腻、共情力强、待人友善、平和沉稳、有耐心、善解人意、乐于助人",
+                external: "在他人眼中，你是性格温和、待人友善的人，浑身散发治愈的气息，让人忍不住想要靠近。你心思细腻观察入微，能轻易发现别人忽略的小细节，总能在别人需要的时候给予最贴心的关怀。你待人真诚没有心机，对身边人都充满善意，愿意无条件倾听别人的烦恼，给予安慰和建议，这样的性格让你成为最值得信赖的朋友。你性格平和很少发脾气，不管遇到什么事情都能保持冷静，用沉稳的态度解决问题，别人和你相处会感到格外心安，因为你从不评判别人，总能用包容的心态接纳一切，让别人可以毫无保留地向你敞开心扉。",
+                advantage: "你有超强的共情能力和同理心，能快速理解别人的感受，成为别人最贴心的朋友和倾听者；温柔和包容能让你收获最真挚的感情，身边的人都愿意真心待你；心思细腻观察入微，能发现别人忽略的细节，在工作和生活中都能考虑得格外周全；性格平和情绪稳定，很少有负面情绪，能给身边的人带来安全感；有足够的耐心，不管做什么事情都能一步一个脚印踏踏实实完成，让人无比信赖；乐于助人不求回报，这样的性格让你能积累良好的人际关系，需要帮助时总能得到别人的回应。你的存在本身就是一种治愈，能让浮躁的心安静下来，让焦虑的情绪得到抚慰。",
+                challenge: "你的温柔有时会变成软弱，不懂拒绝别人，容易被别人欺负，让自己陷入委屈的境地；过于包容，总是轻易原谅别人的错误，容易让别人得寸进尺，不懂得珍惜你的好；共情能力太强，容易被别人的负面情绪所影响，把别人的烦恼变成自己的烦恼，让自己感到身心俱疲；心思过于细腻，容易想太多，一点小事就会在心里反复琢磨，导致自己陷入焦虑；性格过于平和，缺乏主见，做事容易犹豫不决，容易被别人的意见所左右；总是委屈自己成全别人，忽略自己的需求和感受，长期下来会让自己感到压抑和疲惫。这些挑战提醒你需要学会保护自己的能量，既要温暖他人，也要照顾好自己。",
+                energyColor: "草绿、薄荷绿、墨绿、橄榄绿、豆绿",
+                suitableField: "教育、医护、人力资源、心理咨询、社工、服务行业、编辑、园艺",
+                adaptSuggest: "穿搭上，可选择薄荷绿、豆绿等清新的绿色系单品，如薄荷绿衬衫、豆绿针织衫，凸显温柔气质又给人清新治愈的感觉，搭配白色、浅卡其等色系让造型更干净；社交中，学会建立自己的边界感，勇敢拒绝别人不合理的请求，不要一味委屈自己，学会关注自己的感受，对于别人的负面情绪要学会适当抽离，不要把别人的烦恼都扛在自己身上；工作中，培养自己的主见，学会独立思考，不要轻易被别人的意见所左右，做决策时要果断，不要犹豫不决，学会展现自己的能力，不要总是默默付出，让别人看到你的价值；生活中，学会放下胡思乱想，不要一点小事就钻牛角尖，让内心更放松，学会原谅自己的不完美，不要对自己过于苛刻，多关注自己的需求，学会爱自己，给自己足够的关怀和陪伴，让内心更强大。"
+            },
+            blue: {
+                title: "🔵 蓝色气场 —— 深海智者",
+                desc: "你的气场是深邃的深海蓝，像平静的大海，表面波澜不惊，内里却藏着万千世界，自带一种理性的力量和沉稳的气质。你骨子里藏着一种天生的冷静和理智，不管遇到什么事情，都能保持清醒的头脑，用理性的思维分析问题、解决问题。你喜欢思考，善于观察，总能透过现象看到本质，用独特的视角看待这个世界。你的蓝色气场让你成为身边人的“定海神针”，当别人感到迷茫、慌乱时，只要有你在，就能感受到安心和踏实，因为你总能用理性的分析和沉稳的态度，给别人最靠谱的建议和解决方案。你的人生就像一片深邃的大海，包容一切，却又始终保持着自己的节奏和方向。蓝色代表着你的智慧和深度，你不满足于表面的了解，总是追求更深刻的理解和认知。你喜欢思考人生的意义，探索世界的奥秘，你的内心世界就像一片汪洋大海，广阔而深邃，充满了无限的可能。",
+                coreTrait: "理性冷静、沉稳内敛、善于思考、洞察力强、心思缜密、有边界感、做事严谨、低调务实",
+                external: "在他人眼中，你是性格沉稳、做事严谨的人，浑身散发理性的光芒，让人感到无比信赖。你话不多但句句在点，从不轻易发表自己的观点，一旦开口就会切中要害，给人带来启发。你喜欢深度交流，讨厌肤浅的社交，对于自己不感兴趣的话题会选择沉默，不会勉强自己参与。你做事低调务实，不喜欢张扬，总是默默付出，用结果证明自己的能力。你有清晰的边界感，懂得和别人保持适当的距离，不会轻易向别人敞开心扉，也不会轻易窥探别人的隐私，别人和你相处会感到格外安心，因为你情绪稳定做事靠谱，不管遇到什么事情都能保持冷静从容应对。",
+                advantage: "你有超强的理性思维和分析能力，能快速理清问题的思路，找到最有效的解决方案；洞察力极强，能透过现象看到本质，轻易识破别人的伪装，做出正确的判断；做事严谨心思缜密，考虑问题周全，很少出现失误，让人无比信赖；性格沉稳情绪稳定，不管遇到什么突发情况都能保持冷静从容应对，是团队中的定海神针；有清晰的边界感，懂得尊重别人也懂得保护自己，让人际关系更健康；低调务实不喜欢张扬，默默付出的性格，能让你在工作中积累更多的实力，厚积薄发。你的理性和沉稳让你在任何情况下都能保持清醒的头脑，做出最正确的判断。",
+                challenge: "你的理性有时会变成冷漠，过于注重逻辑和分析，忽略了自己和别人的情绪感受，让人觉得你不近人情；过于内敛，不喜欢表达自己的想法和感受，容易让别人误解你，也容易让自己的内心感到压抑；喜欢思考容易想太多，一点小事就会在心里反复分析，导致自己陷入焦虑和内耗；有太强的边界感，有时会和别人保持过于遥远的距离，难以建立深度的人际关系，让人觉得你难以接近；做事过于严谨追求完美，容易陷入细节，导致做事效率低下；不喜欢冒险过于保守，容易错过一些难得的机遇，让自己的人生缺乏突破。这些挑战提醒你需要学会平衡理性和感性，既保持冷静思考，也要学会表达情感。",
+                energyColor: "深海蓝、雾霾蓝、宝蓝、藏蓝、天青蓝",
+                suitableField: "科研、金融、法律、策划、技术研发、心理咨询、编辑、数据分析",
+                adaptSuggest: "穿搭上，可选择雾霾蓝、藏蓝等沉稳的蓝色系单品，如雾霾蓝西装、藏蓝衬衫，凸显理性气质又给人温和的感觉，搭配白色、浅灰色等色系让造型更清爽；社交中，学会适当表达自己的想法和感受，不要总是把自己封闭起来，学会用温柔的方式和别人交流，多关注别人的情绪感受，不要一味地用理性分析一切，适当放下自己的边界感，主动向身边的人敞开心扉，建立深度的人际关系；工作中，学会抓大放小，不要过于纠结细节，提高做事效率，学会适当冒险，接受新的挑战，不要因为过于保守而错过机遇，学会用更灵活的方式解决问题，不要一味地循规蹈矩；生活中，学会放下过度的思考，让内心得到放松，不要陷入自我内耗，学会培养自己的感性思维，多接触艺术、文学等领域，让生活更有温度，学会表达自己的情绪，不要把所有的感受都憋在心里，让内心更轻松。"
+            },
+            purple: {
+                title: "💜 紫色气场 —— 神秘先知",
+                desc: "你的气场是优雅的神秘紫，像夜空的繁星，优雅而神秘，自带一种独特的灵性和艺术气息，走到哪里都能让人感受到与众不同的魅力。你骨子里藏着一种天生的独特和骄傲，不喜欢随波逐流，有自己的想法和追求，活成了别人眼中“最特别的那一个”。你思维独特，直觉敏锐，总能感受到别人感受不到的东西，对未知的事物充满了探索欲。你的紫色气场让你自带一种疏离的美感，不是冷漠，而是一种自带的结界，让你和这个浮躁的世界保持着适当的距离，活在自己的精神世界里。你对美有极致的追求，不管是生活还是工作，都希望做到独一无二，你的人生就像一首抽象的诗，懂的人视若珍宝，不懂的人只能驻足观望。紫色代表着你的灵性和神秘，你有着超越常人的直觉和洞察力，能够感知到别人无法察觉的能量和信息。你的内心世界丰富多彩，充满了想象力和创造力，你就像一个来自远方的旅人，带着神秘的故事和独特的智慧，在这个世界上留下自己的印记。",
+                coreTrait: "独特优雅、灵性十足、直觉敏锐、思维独特、追求完美、有艺术感、内心丰富、特立独行",
+                external: "在他人眼中，你是气质独特、优雅神秘的人，浑身散发艺术的气息，让人忍不住想要探究。你不喜欢随大流，有自己的审美和追求，不管是穿搭还是生活方式，都显得格外与众不同。你话不多但字字珠玑，总能说出一些有深度、有内涵的话，给人带来启发。你内心丰富情感细腻，对生活有自己的理解和感悟，不喜欢和别人进行肤浅的交流。你自带一种疏离感，不会轻易和别人打成一片，也不会轻易向别人敞开心扉，让人觉得你既优雅又神秘，别人和你相处会感到格外轻松，因为你从不评判别人，也不会勉强别人接受自己的观点，尊重每个人的独特性。",
+                advantage: "你有超强的直觉和洞察力，能快速捕捉到事物的本质，做出正确的判断；思维独特想象力丰富，在艺术和创意领域能大放异彩，做出独一无二的作品；对美有极致的追求，审美在线，不管是生活还是工作，都能做到精致而优雅；内心丰富情感细腻，能感受到生活中的更多美好，让人生更有深度；特立独行不随波逐流，有自己的想法和追求，能活成最真实的自己；灵性十足，对未知的事物充满探索欲，能不断学习和成长，让人生充满无限可能。你的独特和神秘让你拥有强大的吸引力，人们总是被你的气质所吸引，想要更深入地了解你。",
+                challenge: "你的独特有时会变成孤僻，过于追求与众不同，容易和身边的人格格不入，难以融入集体；过于神秘，不喜欢表达自己的想法和感受，容易让别人误解你，也容易让自己的内心感到孤独；直觉有时会让你过于感性，做事容易跟着感觉走，缺乏理性的分析，导致决策出现偏差；追求完美，对自己和别人要求过高，容易让自己和身边的人感到疲惫；内心过于丰富，容易想太多，一点小事就会在心里反复琢磨，导致自己陷入焦虑和内耗；不喜欢被束缚，追求自由和独特，偶尔会因为无视规则而给自己带来麻烦。这些挑战提醒你需要学会平衡独特和融入，既保持个性，也要学会与他人建立连接。",
+                energyColor: "香芋紫、电光紫、薰衣草紫、葡萄紫、藕紫",
+                suitableField: "艺术创作、设计、时尚、文创、疗愈、瑜伽、哲学、文学",
+                adaptSuggest: "穿搭上，可选择香芋紫、薰衣草紫等柔和的紫色系单品，如香芋紫连衣裙、薰衣草紫针织衫，凸显优雅气质又不张扬，搭配白色、银色等色系让造型更有高级感；社交中，学会适当表达自己的想法和感受，不要总是把自己封闭在自己的世界里，学会主动和身边的人交流，让别人更了解你，放下自己的疏离感，尝试融入集体，感受团队的温暖；工作中，学会把自己的创意和理性结合起来，做事前多进行理性的分析，不要一味地跟着感觉走，学会接受不完美，不要对自己和别人要求过高，让工作更轻松，学会遵守规则，在规则的框架内发挥自己的独特和创意；生活中，学会放下过度的思考，让内心得到放松，不要陷入自我内耗，学会和孤独相处，享受独处的时光，同时也学会珍惜身边的人，不要因为自己的独特而忽略了身边的温暖，学会用更平和的心态看待世界，让人生更从容。"
+            },
+            pink: {
+                title: "🩷 粉色气场 —— 温柔爱人",
+                desc: "你的气场是甜美的温柔粉，像春日里的樱花，温柔而浪漫，自带一种柔软的力量，走到哪里都能让身边的人感受到满满的爱意和温暖。你骨子里藏着一种天生的浪漫和柔软，性格温柔，心思细腻，对生活充满了美好的期待，相信世间所有的美好。你待人友善，心怀善意，总是愿意用温柔的方式对待身边的每一个人，用爱去包容这个世界的不完美。你的粉色气场让你成为身边人的“小天使”，当别人感到难过、失落时，只要有你在，就能感受到满满的爱意和温暖，重新燃起对生活的美好期待。你的人生就像一场浪漫的童话，充满了甜蜜和美好，用温柔的力量温暖着自己和身边的每一个人。粉色代表着你的爱和温柔，你像一朵盛开的花朵，用自己的美丽和芬芳装点着这个世界。你相信爱能治愈一切，相信善良能感化一切，你用自己的方式默默传递着爱和温暖，让这个世界因为有你而变得更加美好。",
+                coreTrait: "温柔浪漫、心思细腻、单纯善良、心怀善意、追求美好、共情力强、感性柔软、懂得珍惜",
+                external: "在他人眼中，你是性格温柔、长相甜美的人，浑身散发浪漫的气息，让人忍不住想要呵护。你心思细腻情感丰富，总能用温柔的方式对待身边的人，说话轻声细语，做事慢条斯理，让人感到格外舒服。你对生活充满美好的期待，喜欢一切浪漫的事物，生活过得精致而甜蜜，让人羡慕。你待人真诚心怀善意，没有心机，对身边人都充满爱意，愿意无条件帮助别人，这样的性格让你收获了很多真心的朋友。别人和你相处会感到格外温暖，因为你总是用爱去包容一切，用温柔去化解矛盾，让身边的人都能感受到满满的善意。",
+                advantage: "你有超强的共情能力和同理心，能快速理解别人的感受，用温柔的方式给予别人安慰和陪伴；温柔和浪漫能让你收获最真挚的感情，身边的人都愿意真心待你、呵护你；心思细腻观察入微，能发现生活中的小美好，让人生充满甜蜜和乐趣；单纯善良内心干净，对世界充满善意，能感受到生活中的更多美好；懂得珍惜，珍惜身边的每一个人，珍惜生活中的每一个小美好，让人生充满感恩；感性柔软情感丰富，能创作出充满爱意的作品，在艺术和情感领域能大放异彩。你的温柔和善良让你拥有强大的吸引力，人们愿意靠近你、信任你、依赖你。",
+                challenge: "你的温柔有时会变成软弱，不懂拒绝别人，容易被别人欺负，让自己陷入委屈的境地；过于感性，容易被情绪左右，做事缺乏理性的分析，导致决策出现偏差；心思过于细腻，容易想太多，一点小事就会在心里反复琢磨，导致自己陷入焦虑和内耗；追求美好，容易活在自己的童话世界里，对现实的残酷缺乏足够的认识，遇到问题时容易手足无措；共情能力太强，容易被别人的负面情绪所影响，把别人的烦恼变成自己的烦恼，让自己感到身心俱疲；性格过于柔软，缺乏主见，容易被别人的意见所左右，做事容易犹豫不决。这些挑战提醒你需要学会保护自己的柔软，在保持温柔的同时也要有坚强的内核。",
+                energyColor: "樱花粉、蜜桃粉、豆沙粉、裸粉、玫瑰粉",
+                suitableField: "花艺、烘焙、美妆、婚纱设计、幼教、心理咨询、文创、甜品设计",
+                adaptSuggest: "穿搭上，可选择樱花粉、豆沙粉等柔和的粉色系单品，如樱花粉连衣裙、豆沙粉针织开衫，凸显温柔浪漫的气质，搭配白色、米色等浅色系让造型更甜美；社交中，学会建立自己的边界感，勇敢拒绝别人不合理的请求，不要一味地委屈自己，学会关注自己的感受，对于别人的负面情绪要学会适当抽离，不要让别人的情绪影响自己；工作中，学会把感性和理性结合起来，做事前多进行理性的分析，不要一味地跟着情绪走，培养自己的主见，学会独立思考，不要轻易被别人的意见所左右，做决策时要果断；生活中，学会接受现实的不完美，不要活在自己的童话世界里，学会面对生活中的挫折和困难，培养自己的抗压能力，学会放下胡思乱想，不要一点小事就钻牛角尖，让内心更放松，同时也要学会爱自己，把对别人的温柔和爱意分一点给自己。"
+            },
+            brown: {
+                title: "🤎 棕色气场 —— 大地守护者",
+                desc: "你的气场是沉稳的大地棕，像广袤的大地，厚重而踏实，自带一种可靠的力量和包容的气质，走到哪里都能让身边的人感到安心和踏实。你骨子里藏着一种天生的踏实和稳重，做事一步一个脚印，从不投机取巧，对待身边的人真诚而包容，愿意用自己的力量守护身边的人。你不喜欢张扬，总是默默付出，用行动证明自己的价值，而不是用言语。你的棕色气场让你成为身边人的“避风港”，当别人感到迷茫、无助时，只要有你在，就能感受到满满的安全感，因为你总能用自己的踏实和稳重，给别人最可靠的支撑。你的人生就像一片肥沃的土地，默默滋养着身边的人，不求回报，却总能收获最真挚的感情。棕色代表着你的稳定和可靠，你像一棵大树一样扎根大地，无论风雨如何侵袭，都能屹立不倒。你不追求光鲜亮丽的外表，更看重内在的充实和稳定，你知道只有脚踏实地，才能走得更远。你的存在本身就是一种力量，能给身边的人带来安全感和依靠。",
+                coreTrait: "踏实稳重、可靠包容、默默付出、脚踏实地、有责任感、温和内敛、坚韧不拔、勤俭节约",
+                external: "在他人眼中，你是性格沉稳、做事靠谱的人，浑身散发踏实的气息，让人忍不住想要依赖。你不喜欢说大话，总是用行动证明自己，答应别人的事情一定会做到，让人无比信赖。你待人温和包容，不会轻易发脾气，不管遇到什么事情都能保持冷静，用沉稳的态度解决问题。你不喜欢张扬，总是默默付出，不求回报，这样的性格让你成为最值得依靠的朋友和家人。别人和你相处会感到格外安心，因为你从不计较得失，总能用包容的心态对待身边的人，用自己的力量守护身边的人。",
+                advantage: "你有超强的责任感和执行力，答应别人的事情一定会做到，让人无比信赖；踏实稳重做事靠谱，一步一个脚印，从不投机取巧，能把事情做得尽善尽美；温和包容待人友善，能收获最真挚的感情，身边的人都愿意真心待你；坚韧不拔抗压能力强，面对困难和挫折从不轻言放弃，总能坚持到底；默默付出不求回报，这样的性格让你能积累良好的人际关系，需要帮助时总能得到别人的回应；勤俭节约懂得珍惜，能把生活过得井井有条，让人感到安心。你的可靠和稳重让你成为团队中的中流砥柱，无论遇到什么困难，大家都会想到依靠你。",
+                challenge: "你的踏实有时会变成固执，过于坚持自己的想法，不愿意接受新的观点和方法，导致做事效率低下；过于内敛，不喜欢表达自己的想法和感受，容易让别人误解你，也容易让自己的内心感到压抑；默默付出不求回报，容易让别人忽略你的价值，把你的付出当成理所当然；做事过于稳重，缺乏冒险精神，容易错过一些难得的机遇，让自己的人生缺乏突破；不喜欢张扬，总是隐藏自己的能力，容易让别人低估你的实力；过于包容，总是轻易原谅别人的错误，容易让别人得寸进尺，不懂得珍惜你的好。这些挑战提醒你需要学会表达自己，在保持踏实的同时也要学会灵活变通。",
+                energyColor: "咖啡棕、焦糖棕、巧克力棕、驼色、卡其色",
+                suitableField: "建筑、工程、财务管理、农业、手工艺、教育、行政管理、物流",
+                adaptSuggest: "穿搭上，可选择咖啡棕、驼色等温暖的棕色系单品，如咖啡棕西装、驼色大衣，凸显踏实稳重的气质，搭配白色、米色等浅色系让造型更柔和；社交中，学会适当表达自己的想法和感受，不要总是默默付出，让别人知道你的需求和感受，学会拒绝别人不合理的请求，不要一味地包容别人，学会保护自己；工作中，学会接受新的观点和方法，不要过于固执，适当尝试新的思路，提高做事效率，学会展现自己的能力，不要总是隐藏自己的实力，让别人看到你的价值，学会适当冒险，接受新的挑战，不要因为过于保守而错过机遇；生活中，学会放松自己，不要总是把自己绷得太紧，给自己留出享受生活的时间，学会接受别人的帮助，不要什么事情都自己扛，让身边的人也有机会照顾你。"
+            },
+            silver: {
+                title: "🤍 银色气场 —— 未来之镜",
+                desc: "你的气场是清冷的金属银，像月光下的湖面，冷静而通透，自带一种超越世俗的智慧和洞察力，走到哪里都能让人感受到一种独特的清醒和理智。你骨子里藏着一种对完美的追求和对真相的执着，不喜欢虚伪和做作，总是用最真实的态度面对自己和这个世界。你思维敏捷，反应快速，总能第一时间抓住问题的关键，用最直接的方式解决问题。你的银色气场让你成为身边人的“清醒剂”，当别人被情绪左右、迷失方向时，只要有你在，就能看清事情的本质，找到最正确的方向。你的人生就像一面镜子，照见真相，也照见自己，用清醒的眼光看待这个世界，不盲从、不迷信，始终保持着自己的独立思考和判断。银色代表着你的理性和清醒，你像月光一样清冷而明亮，不刺眼却足够照亮黑暗。你不追求热闹和喧嚣，更喜欢独处和思考，在寂静中聆听内心的声音，在孤独中寻找真理。你的存在就像一面镜子，照见了世界的真相，也照见了别人内心的真实。",
+                coreTrait: "理性清醒、洞察力强、追求完美、思维敏捷、独立自主、冷静客观、有原则、不盲从",
+                external: "在他人眼中，你是思维敏捷、反应快速的人，浑身散发清醒的气息，让人不敢轻易欺骗你。你话不多但一针见血，总能一眼看穿问题的本质，给出最直接有效的解决方案。你追求完美，对自己要求严格，做任何事情都力求做到最好，这样的性格让你在工作中表现出色，让人无比信赖。你不喜欢虚伪和做作，待人真诚直接，从不会为了讨好别人而违背自己的原则。你有自己独立的思想和判断，不会人云亦云，也不会轻易被别人的意见所左右，别人和你相处会感到格外清醒，因为你总能点醒梦中人，让他们看清真相。",
+                advantage: "你有超强的洞察力和分析能力，能一眼看穿问题的本质，找到最有效的解决方案；思维敏捷反应快速，能在第一时间抓住机会，做出最正确的判断；追求完美对自己要求严格，做任何事情都力求做到最好，让人无比信赖；独立自主有主见，不会轻易被别人的意见所左右，能坚持自己的原则和底线；待人真诚直接，不虚伪不做作，能收获最真实的朋友；冷静客观情绪稳定，不管遇到什么突发情况都能保持清醒的头脑，做出最理性的判断。你的清醒和理智让你在任何情况下都能保持冷静的头脑，做出最正确的选择。",
+                challenge: "你的理性有时会变成冷漠，过于追求真相和完美，忽略了自己和别人的感受，让人觉得你不近人情；过于清醒，有时会显得苛刻，对别人要求过高，容易让身边的人感到压力；追求完美，对自己和别人要求过高，容易让自己和身边的人感到疲惫；过于独立，不喜欢依赖别人，也不喜欢被别人依赖，容易让自己感到孤独；思维过于敏捷，说话太直接，有时会无意间伤害别人的感情；不喜欢虚伪，容易得罪那些喜欢伪装的人，给自己带来不必要的麻烦。这些挑战提醒你需要学会平衡理性和感性，在保持清醒的同时也要学会包容和理解。",
+                energyColor: "亮银、雾银、灰银、银白、锡器灰",
+                suitableField: "科技研发、金融分析、法律事务、媒体评论、科学研究、策略规划、编辑、品控",
+                adaptSuggest: "穿搭上，可选择银灰色系单品，如雾银西装、灰银针织衫，凸显冷静理性的气质，搭配白色、黑色等色系让造型更高级；社交中，学会适当照顾别人的感受，说话不要太直接，多用委婉的表达方式，学会包容别人的不完美，不要对别人要求过高，学会接受人性中的复杂和矛盾；工作中，学会平衡完美和效率，不要因为追求完美而影响工作进度，学会适当放低标准，接受80分的成果，学会团队合作，不要什么事情都自己扛，相信团队的力量；生活中，学会放松自己，不要总是绷得太紧，给自己留出享受生活的时间，学会表达情感，不要把所有的感受都憋在心里，让内心更柔软，学会和孤独相处，同时也学会珍惜身边的人，建立温暖的人际关系。"
+            },
+            gold: {
+                title: "💛 金色气场 —— 永恒之光",
+                desc: "你的气场是璀璨的闪耀金，像太阳的光芒，耀眼而永恒，自带一种与生俱来的高贵和自信，走到哪里都能成为最耀眼的存在。你骨子里藏着一种对卓越的追求和对完美的执着，不甘平庸，不愿平凡，总想在自己擅长的领域做到最好，成为最顶尖的那一个。你有着超强的自信和魅力，不需要刻意表现，就能吸引所有人的目光，成为人群中的焦点。你的金色气场让你成为身边人的“灯塔”，当别人感到迷茫、失落时，只要有你在，就能看到希望和方向，因为你就是那个永远闪耀、永不熄灭的光芒。你的人生就像一部传奇，充满了荣耀和辉煌，用自己的光芒照亮自己，也照亮身边的人。金色代表着你的高贵和卓越，你像太阳一样耀眼而温暖，用自己的光芒照亮了世界。你不甘平庸，追求卓越，在任何领域都力求做到最好，成为最顶尖的那一个。你的存在本身就是一种激励，让人们看到什么是优秀，什么是卓越，激励着身边的人也努力向上，追求更好的自己。",
+                coreTrait: "自信高贵、追求卓越、魅力十足、目标明确、坚韧不拔、有领导力、光芒四射、感染力强",
+                external: "在他人眼中，你是充满自信、魅力十足的人，浑身散发高贵的气息，让人忍不住想要追随。你有着明确的目标和方向，知道自己想要什么，也知道该怎么得到，这样的笃定感让你在人群中显得格外耀眼。你做事专注投入，一旦认准目标就会全力以赴，不达目的不罢休，这样的执着让你在事业上取得令人瞩目的成就。你待人真诚大方，从不吝啬自己的赞美和帮助，愿意用自己的光芒照亮身边的人，这样的性格让你收获了很多真心的追随者。别人和你相处会感到格外有动力，因为你总能用你的热情和执着感染他们，让他们也变得更加优秀。",
+                advantage: "你有超强的自信心和魅力，能快速吸引别人的注意力，成为人群中的焦点；追求卓越目标明确，知道自己想要什么，也知道该怎么得到，能取得令人瞩目的成就；坚韧不拔抗压能力强，面对困难和挫折从不轻言放弃，总能坚持到底直到成功；有领导力和感染力，能用自己的热情和执着感染身边的人，带领团队一起前进；待人真诚大方，愿意帮助别人成长，能收获最真挚的感情和最忠诚的追随者；做事专注投入，一旦认准目标就会全力以赴，这样的专注力让你在任何领域都能做到顶尖。你的光芒和魅力让你拥有强大的吸引力，人们愿意追随你、信任你、支持你。",
+                challenge: "你的自信有时会变成自负，过于相信自己的能力，忽略别人的意见和建议，导致决策出现偏差；追求卓越，对自己和别人要求过高，容易让自己和身边的人感到疲惫；过于耀眼，有时会让身边的人感到压力，觉得自己无法企及你的高度；目标过于明确，有时会忽略沿途的风景，让自己的人生缺乏乐趣和惊喜；做事过于专注，容易忽略生活中的其他方面，导致生活失衡；待人真诚大方，但有时会过于理想化，容易被人利用或辜负。这些挑战提醒你需要学会平衡卓越和快乐，在追求成功的同时也要享受生活。",
+                energyColor: "黄金色、香槟金、玫瑰金、白金、古铜金",
+                suitableField: "企业管理、创业、金融投资、演艺事业、高端销售、品牌管理、咨询顾问、政治",
+                adaptSuggest: "穿搭上，可选择香槟金、玫瑰金等柔和的金色系单品，如香槟金礼服、玫瑰金配饰，凸显高贵气质又不张扬，搭配白色、黑色等色系让造型更有层次感；社交中，学会放低姿态，多倾听别人的意见和建议，不要总是以自我为中心，学会欣赏别人的优点，不要总是觉得自己是最好的，学会接受别人的不完美，不要对别人要求过高；工作中，学会适当放权，相信团队的力量，不要什么事情都自己扛，学会平衡工作和生活，给自己留出享受生活的时间，学会接受失败，不要因为一次失败就否定自己，从失败中吸取教训继续前进；生活中，学会放慢脚步，享受当下的美好，不要总是追求下一个目标，学会珍惜身边的人，不要因为忙于工作而忽略了家人和朋友，让自己的生活更加丰富多彩。"
+            }
+        };
+
+        // DOM 元素
+        const infoPage = document.getElementById('info-page');
+        const testPage = document.getElementById('test-page');
+        const resultPage = document.getElementById('result-page');
+        const testContainer = document.getElementById('test-container');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitTestBtn');
+        const resultContainer = document.getElementById('resultContainer');
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 开始测试按钮
+            document.getElementById('startTestBtn').addEventListener('click', () => {
+                infoPage.classList.remove('active');
+                testPage.classList.add('active');
+                // 初始化用户答案
+                scientificQuestions.forEach((_, index) => {
+                    userAnswers[index] = null;
+                });
+                currentQ = 0;
+                renderQuestion();
+                updateProgress();
+            });
+
+            // 上一题
+            prevBtn.addEventListener('click', () => {
+                if (currentQ > 0) {
+                    currentQ--;
+                    renderQuestion();
+                    updateProgress();
+                }
+            });
+
+            // 下一题
+            nextBtn.addEventListener('click', () => {
+                if (currentQ < scientificQuestions.length - 1) {
+                    currentQ++;
+                    renderQuestion();
+                    updateProgress();
+                }
+            });
+
+            // 提交测试
+            submitBtn.addEventListener('click', () => {
+                // 检查是否所有题目都已答完
+                const answeredCount = Object.values(userAnswers).filter(v => v !== null).length;
+                if (answeredCount < scientificQuestions.length) {
+                    alert(`您还有 ${scientificQuestions.length - answeredCount} 题未作答，请完成全部题目再查看结果。`);
+                    return;
+                }
+                calculateResult();
+            });
+        });
+
+        // 渲染当前题目
+        function renderQuestion() {
+            const q = scientificQuestions[currentQ];
+            let html = `
+                <div class="question">
+                    <p>${currentQ + 1}. ${q.text}</p>
+                    <div class="options">
+            `;
+            
+            q.options.forEach((opt, optIndex) => {
+                const checked = userAnswers[currentQ] === optIndex ? 'checked' : '';
+                html += `
+                    <div class="option-item" onclick="selectOption(${currentQ}, ${optIndex})">
+                        <input type="radio" name="q${currentQ}" value="${optIndex}" ${checked}>
+                        <label>${opt.text}</label>
+                    </div>
+                `;
+            });
+            
+            html += `</div></div>`;
+            testContainer.innerHTML = html;
+
+            // 更新按钮状态
+            prevBtn.disabled = currentQ === 0;
+            nextBtn.disabled = currentQ === scientificQuestions.length - 1;
+        }
+
+        // 选择选项（全局函数，供onclick调用）
+        window.selectOption = function(qIndex, optIndex) {
+            userAnswers[qIndex] = optIndex;
+            // 更新radio显示
+            const radios = document.getElementsByName(`q${qIndex}`);
+            if (radios.length) {
+                radios.forEach((radio, i) => {
+                    radio.checked = (i === optIndex);
+                });
+            }
+            updateProgress();
+        };
+
+        // 更新进度条
+        function updateProgress() {
+            const answered = Object.values(userAnswers).filter(v => v !== null).length;
+            const percent = (answered / scientificQuestions.length) * 100;
+            progressFill.style.width = `${percent}%`;
+            progressText.textContent = `第${currentQ + 1}题/共${scientificQuestions.length}题 · 已答${answered}题`;
+        }
+
+        // 计算测试结果（返回主色和次色）
+        function calculateResult() {
+            // 初始化各颜色总分
+            const scores = {
+                red: 0, orange: 0, yellow: 0, green: 0, blue: 0,
+                purple: 0, pink: 0, brown: 0, silver: 0, gold: 0
+            };
+
+            // 1. 累加每个题目的得分
+            scientificQuestions.forEach((q, qIndex) => {
+                const answerIndex = userAnswers[qIndex];
+                if (answerIndex !== null) {
+                    const optionScores = q.options[answerIndex].scores;
+                    for (let color in optionScores) {
+                        scores[color] += optionScores[color];
+                    }
+                }
+            });
+
+            // 2. 添加随机扰动因子（防止分数完全相同的情况）
+            for (let color in scores) {
+                scores[color] += Math.random() * 0.3;
+            }
+
+            // 3. 按分数排序
+            const sortedColors = [];
+            for (let color in scores) {
+                sortedColors.push({color, score: scores[color]});
+            }
+            sortedColors.sort((a, b) => b.score - a.score);
+
+            console.log('颜色得分排名:', sortedColors);
+
+            // 4. 获取主色（第一名）
+            const primaryColor = sortedColors[0].color;
+            
+            // 5. 获取次色（第二名）
+            const secondaryColor = sortedColors[1].color;
+
+            // 6. 特殊处理：如果前两名分数差距很小（小于3分），随机选择其中一个作为主色
+            if (sortedColors[0].score - sortedColors[1].score < 3) {
+                const topTwo = [sortedColors[0].color, sortedColors[1].color];
+                const randomIndex = Math.floor(Math.random() * 2);
+                const newPrimary = topTwo[randomIndex];
+                const newSecondary = topTwo[randomIndex === 0 ? 1 : 0];
+                
+                showResultWithSecondary(newPrimary, newSecondary);
+            } else {
+                showResultWithSecondary(primaryColor, secondaryColor);
+            }
+        }
+
+        // 显示结果（包含主色和次色）
+        function showResultWithSecondary(primaryColor, secondaryColor) {
+            const primary = resultTexts[primaryColor];
+            const secondary = resultTexts[secondaryColor];
+            
+            // 移除所有颜色类，添加主色颜色类
+            resultContainer.className = 'result ' + primaryColor;
+            
+            // 构建完整结果HTML（包含次气场颜色）
+            resultContainer.innerHTML = `
+                <h2>${primary.title}</h2>
+                <div class="main-desc">${primary.desc}</div>
+                
+                <!-- 次气场颜色卡片 -->
+                <div class="secondary-color-card">
+                    <div class="secondary-color-title">
+                        <span>✨ 你的次气场：${secondary.title}</span>
+                    </div>
+                    <div class="secondary-color-desc">
+                        除了主导的${primaryColor === 'red' ? '红色' : 
+                                      primaryColor === 'orange' ? '橙色' :
+                                      primaryColor === 'yellow' ? '黄色' :
+                                      primaryColor === 'green' ? '绿色' :
+                                      primaryColor === 'blue' ? '蓝色' :
+                                      primaryColor === 'purple' ? '紫色' :
+                                      primaryColor === 'pink' ? '粉色' :
+                                      primaryColor === 'brown' ? '棕色' :
+                                      primaryColor === 'silver' ? '银色' : '金色'}气场外，你的内心深处还蕴含着${secondaryColor === 'red' ? '红色' :
+                                      secondaryColor === 'orange' ? '橙色' :
+                                      secondaryColor === 'yellow' ? '黄色' :
+                                      secondaryColor === 'green' ? '绿色' :
+                                      secondaryColor === 'blue' ? '蓝色' :
+                                      secondaryColor === 'purple' ? '紫色' :
+                                      secondaryColor === 'pink' ? '粉色' :
+                                      secondaryColor === 'brown' ? '棕色' :
+                                      secondaryColor === 'silver' ? '银色' : '金色'}的能量。这种次气场在你放松或独处时会自然流露，是你性格中重要且不可忽视的组成部分。
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-title">✨ 核心特质</div>
+                    <div class="detail-item">${primary.coreTrait}</div>
+                    
+                    <div class="detail-title">✨ 外在表现</div>
+                    <div class="detail-item">${primary.external}</div>
+                    
+                    <div class="detail-title">✨ 优势所在</div>
+                    <div class="detail-item">${primary.advantage}</div>
+                    
+                    <div class="detail-title">✨ 成长挑战</div>
+                    <div class="detail-item">${primary.challenge}</div>
+                    
+                    <div class="detail-title">✨ 能量色彩</div>
+                    <div class="detail-item">${primary.energyColor}</div>
+                    
+                    <div class="detail-title">✨ 适配领域</div>
+                    <div class="detail-item">${primary.suitableField}</div>
+                </div>
+                
+                <div class="adapt-suggest">
+                    <strong>✨ 专属提升建议</strong>
+                    ${primary.adaptSuggest}
+                </div>
+
+                <!-- 私信引导按钮 -->
+                <div class="private-chat-section">
+                    <button class="private-chat-btn" onclick="showPrivateChat()">
+                        💬 获取专业一对一深度解析
+                    </button>
+                    <div class="private-chat-tip">
+                        点击按钮，添加专属顾问微信，付费1v1完整气场分析报告
+                    </div>
+                    <div id="wechatQR" class="wechat-qr">
+                        <div style="font-size: 18px; margin-bottom: 10px;">👩‍💼 专属顾问</div>
+              
+                        </div>
+                        <div style="margin-top: 15px;">微信号: lfgy771</div>
+                        <div style="font-size: 13px; opacity: 0.8; margin-top: 8px;">扫码添加，备注"气场分析"</div>
+                    </div>
+                </div>
+            `;
+
+            // 切换到结果页
+            testPage.classList.remove('active');
+            resultPage.classList.add('active');
+        }
+
+        // 显示微信二维码
+        window.showPrivateChat = function() {
+            const qrElement = document.getElementById('wechatQR');
+            qrElement.classList.toggle('show');
+        }
+    </script>
+</body>
+</html>
